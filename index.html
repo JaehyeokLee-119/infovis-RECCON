@@ -19,7 +19,7 @@
     <script src="components/datatable.js"></script>
 
 
-    <title>My Scatterplot</title>
+    <title>RECCON Plot</title>
     <style>
         body {
             background: #eee;
@@ -159,7 +159,8 @@
         function updateDataTable() {
             dataTable.update(brushedData && brushedData.length > 0 ? brushedData : data, data.columns)
         }
-
+        
+        // 데이터 받아와서 처리하는 부분
         d3.csv("https://raw.githubusercontent.com/e-/infovis/main/iris.csv")
             .then(csvData => {
                 csvData.forEach(d => {
