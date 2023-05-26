@@ -161,6 +161,8 @@
         }
         
         // 데이터 받아와서 처리하는 부분
+
+        // d3으로 dataset/dailydialog_table_all.csv파일을 불러옴
         d3.csv("https://raw.githubusercontent.com/e-/infovis/main/iris.csv")
             .then(csvData => {
                 csvData.forEach(d => {
