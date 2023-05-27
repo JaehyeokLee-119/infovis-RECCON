@@ -3,12 +3,13 @@ class Overview {
         top: 10, right: 25, bottom: 40, left: 25
     }
 
-    constructor(svg, tooltip, data, width = 250, height = 250) {
+    constructor(svg, tooltip, data) {
         this.svg = svg;
         this.tooltip = tooltip;
         this.data = data;
-        this.width = width;
-        this.height = height;
+        const svg_element = d3.select("svg");
+        this.width = svg_element.node().getBoundingClientRect().width;
+        this.height = svg_element.node().getBoundingClientRect().height;
         this.handlers = {};
     }
 
@@ -28,7 +29,29 @@ class Overview {
 
     }
 
-    update(xVar, yVar, colorVar, useColor) {
+    update() {
+        let data = this.data;
+        console.log(data)
+
+        this.dialog_list = [];
+        for(var i = 0; i < data.length; i++) {
+            this.dialog_list.push(data[i]);
+        }
+        // svg의 정 중앙에 가로줄을 긋는다
+        d3.select('svg')
+            .append("line")
+            .attr("x1", 0)
+            .attr("y1", this.height / 2)
+            .attr("x2", this.width)
+            .attr("y2", this.height / 2)
+            .attr("stroke", "black")
+            .attr("stroke-width", 0.3)
+
+        // 이제 여기다가 각 데이터를 길이(len) 순으로 정렬하고, 그 길이에 맞게 세로줄로 나타내어 가로로 나열한다.
+
+        let lineplots = d3.select('svg')
+            .selectAll("line")
+            .data(this.data)
 
     }
 }

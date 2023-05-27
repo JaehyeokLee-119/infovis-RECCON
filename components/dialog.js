@@ -19,16 +19,17 @@ class Dialog {
         this.max_height = 0;
         this.max_line_len = 40;
 
-        // ['happy', 'neutral', 'angry', 'surprise', 'disgust', 'sad', 'fear', 'excited']
-        this.emotion_color_policy = {
-            'happy': '#FFD700',
-            'neutral': '#808080',
-            'angry': '#FF0000',
-            'surprise': '#00FFFF',
-            'disgust': '#008000',
-            'sad': '#0000FF',
-            'fear': '#800080',
-            'excited': '#FFA500'
+        this.font = "Ubuntu";
+
+        this.emotion_color_policy = { // From d3.schemeCategory10
+            'happy': '#ff7f0e',
+            'neutral': '#7f7f7f',
+            'angry': '#d62728',
+            'surprise': '#2ca02c',
+            'disgust': '#bcbd22',
+            'sad': '#1f77b4',
+            'fear': '#8C564B',
+            'excited': '#17becf'
         }
     }
 
@@ -44,7 +45,7 @@ class Dialog {
     }
 
     update(did) {
-        data = this.data;
+        let data = this.data;
 
         this.utterance_list = [];
         for(var i = 0; i < data.length; i++) {
@@ -52,8 +53,7 @@ class Dialog {
                 this.utterance_list.push(data[i]);
             }
         }
-        console.log(this.utterance_list);
-
+        console.log('utterance_list', this.utterance_list);
         let onMouseOver = function() {
             d3.select(this) // 현재 요소 선택 (<g> 요소)
               .selectAll("text") // 하위 <text> 요소 선택
@@ -99,13 +99,14 @@ class Dialog {
             .attr("y", (d, i) => i * this.fontsize + this.udmargin*i)
             .attr("dy", this.fontsize)
             .attr("font-size", 15)
-            .attr("font-family", "sans-serif")
+            .attr("font-family", this.font)
             .attr("fill", "black")
             .attr("class", "speaker")
             .attr("text-anchor", "middle")
             .attr("alignment-baseline", "middle")
             .attr("dominant-baseline", "middle")
             .attr("id", (d, i) => "speaker" + i)
+            .attr("font-weight", "bold")
             .attr("transform", (d, i) => `translate(${(i%2 == 0 ? 1 : -1)*this.lrmargin+this.fontsize/2 + this.boxpadding/2}, ${this.udmargin+this.fontsize/2 + this.boxpadding/2})`)
 
         let texts = conversation.append("text") // 발화내용부분
@@ -117,7 +118,7 @@ class Dialog {
             .text(d => (d.text)) // put each utterance into svg.text with automatic line break
             .attr("width", this.textbox_width)
             .attr("font-size", 15)
-            .attr("font-family", "sans-serif")
+            .attr("font-family", this.font)
             .attr("fill", "black")
             .attr("alignment-baseline", "start")
             .attr("dominant-baseline", "middle")
@@ -156,14 +157,15 @@ class Dialog {
                     line_count++;
                 }
             }
-            // 마지막에  + ` (${d.emotion})` 붙여주기
-            console.log(this.emotion_color_policy[d.emotion]);
+            // 각 발화의 emotion에 따라 글자에 색깔을 부여한다
+            // 마지막에  + ` (${d.emotion})` 붙여주고 색깔 부여
             svg_text.append("tspan")
                 .attr("x", svg_text.attr("x"))
                 .attr("dx", svg_text.attr("dx"))
                 .attr("dy", svg_text.attr("dy")+this.fontsize)
                 .text(`(${d.emotion})`)
                 .attr("fill", this.emotion_color_policy[d.emotion])
+                .attr("font-weight", "bold")
             line_count++;
             svg_text.attr("line_count", line_count);
         });
@@ -195,8 +197,6 @@ class Dialog {
         d3.select(this.svg)
             .attr("height", this.height < this.max_height ? this.max_height : this.height);
     
-        // 각 발화의 emotion에 따라 글자에 색깔을 부여한다
-        
     }
     
 }

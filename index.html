@@ -48,14 +48,27 @@
         </nav>
 
     </header>
-    <main class="container pb-3">
+    <main class="container pb-3"><div class="row pt-2">
+        <div class="col-2 text-end pe-2"><strong>정렬 기준:</strong></div>
+            <div class="col-10">
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="sorting-criteria" value="length" id="sc-len"
+                        checked>
+                    <label class="form-check-label" for="x-sl">대화 길이</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="sorting-criteria" value="emotion" id="sc-emo">
+                    <label class="form-check-label" for="x-sw">대화 감정</label>
+                </div>
+            </div>
+        </div>
         <div class="row">
             <svg width="100%" height="300" id="overview">
                 <rect width="100%" height="100%" fill="white" stroke="black" stroke-width="2">
 
                 </rect>
             </svg>
-            <div class="tooltip bs-tooltip-top show" id="sc-tooltip" role="tooltip" style="display:none">
+            <div class="tooltip bs-tooltip-top show" id="overview-tooltip" role="tooltip" style="display:none">
                 <div class="tooltip-arrow"></div>
                 <div class="tooltip-inner">
                     Some tooltip text!
@@ -89,34 +102,51 @@
     <script>
         let data, dialog, overview;
         let filepath = "http://localhost:8000/dailydialog_table_all.csv";
-
+        let filepath_overview = "http://localhost:8000/dailydialog_table.csv";
+        
+        let did = "tr_4466"
 
         function updateDialog() {
-            let did = "te_767"
             dialog.update(did);
 
             // #dialog_num의 text를 업데이트
             d3.select("#dialog_num").text("Dialog: " + did);
         }
+        function updateOverview() {
+            overview.update();
+        }
 
         // CSV 파일 경로
         const csvFilePath = filepath;
-        let datas = [];
+        let datas_all = [];
+        let datas_overview = [];
         
-        d3.csv(filepath)
+        // 파일 불러오기
+        d3.csv(filepath) // 파일 1에 대해서 update (#dialog, #graph)
             .then(csvData => {
                 csvData.forEach(d => {
-                    datas.push(d)
+                    datas_all.push(d)
                 });
-                data = datas;
-                dialog = new Dialog("#dialog", data);
-                overview = new Overview("#overview");
+                data_all = datas_all;
+                dialog = new Dialog("#dialog", data_all);
                 dialog.update();
 
                 updateDialog();
 
             })
         
+        d3.csv(filepath_overview) // 파일 2에 대해서 update (#overview)
+            .then(csvData_overview => {
+                csvData_overview.forEach(d => {
+                    datas_overview.push(d)
+                });
+                datas_overview = datas_overview;
+                overview = new Overview("#overview", '#overview-tooltip', datas_overview);
+                overview.update();
+
+                updateOverview();
+
+            })
 
 
     </script>
