@@ -1,4 +1,4 @@
-dialog_id,turn,speaker,text,emotion,cause turn,cause span,cause_type,explanation
+dialog_id,turn,speaker,text,emotion,cause_turn,cause_span,cause_type,explanation
 tr_4466,1,A,"Hey, you wanna see a movie tomorrow?",happy,[1],['see a movie tomorrow?'],['no-context'],
 tr_4466,2,B,Sounds like a good plan. What do you want to see?,happy,[1],['see a movie tomorrow?'],['inter-personal'],
 tr_4466,3,A,How about Legally Blonde.,neutral,,,,

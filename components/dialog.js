@@ -16,8 +16,6 @@ class Dialog {
         this.lrmargin = 10;
         this.udmargin = 5;
 
-        this.max_height = 0;
-        this.max_line_len = 40;
 
         this.font = "Ubuntu";
 
@@ -34,26 +32,25 @@ class Dialog {
     }
 
     initialize() {
-        this.svg = d3.select(this.svg);
-        this.container = this.svg.append("g");
-        this.svg
-            .attr("width", this.width + this.margin.left + this.margin.right)
-            .attr("height", this.height + this.margin.top + this.margin.bottom);
-        this.container.attr("transform", `translate(${this.margin.left}, ${this.margin.top})`);
-
-        
+        this.listed_data = this.data;
     }
 
     update(did) {
-        let data = this.data;
-
         this.utterance_list = [];
-        for(var i = 0; i < data.length; i++) {
-            if(data[i].dialog_id == did) {
-                this.utterance_list.push(data[i]);
+
+        // Get utterances with dialog_id
+        for(var i = 0; i < this.listed_data.length; i++) {
+            if(this.listed_data[i].dialog_id == did) {
+                this.utterance_list.push(this.listed_data[i]);
             }
         }
-        console.log('utterance_list', this.utterance_list);
+        this.max_height = 0;
+        this.max_line_len = 40;
+        // 이전에 그렸던 것들 정리
+        d3.select(this.svg).selectAll("*").remove();
+        // height 원래대로 돌리기
+        this.height = 400;
+
         let onMouseOver = function() {
             d3.select(this) // 현재 요소 선택 (<g> 요소)
               .selectAll("text") // 하위 <text> 요소 선택
