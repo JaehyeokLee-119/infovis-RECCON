@@ -76,13 +76,13 @@
             </div>
         </div>
         <div class="row">
-            <div class="col text-lg-end">
+            <div class="col-6 text-lg-end">
                 <nav class="navbar navbar-light bg-light">
                     <div class="fluid">
                         <span class="text-center navbar-brand mb-0 h1" id="dialog_num">Dialog: </span>
                     </div>
                 </nav>
-                <div style="width: 420px; height: 450px; overflow-y: scroll;">
+                <div style="width: 420px; height: 800px; overflow-y: scroll;">
                     <svg width="100%" height="100%" id="dialog">
                         <rect width="100%" height="100%" fill="white" stroke="black" stroke-width="2">
         
@@ -90,13 +90,18 @@
                     </svg>
                 </div>
             </div>
-            <div class="col text-lg-start">
-                <svg width="100%" height="500" id="network_node_link">
+            <div class="col-6 text-lg-start">
+                <nav class="navbar navbar-light bg-light">
+                    <div class="fluid">
+                        <span class="text-center navbar-brand mb-0 h1" id="dialog_num">Emotion-Cause Pair relationship</span>
+                    </div>
+                </nav>
+                <svg width="100%" height="400" id="network_adjacency_matrix">
                     <rect width="100%" height="100%" fill="white" stroke="black" stroke-width="2">
     
                     </rect>
                 </svg>
-                <svg width="100%" height="500" id="network_adjacency_matrix">
+                <svg width="100%" height="200" id="network_legend">
                     <rect width="100%" height="100%" fill="white" stroke="black" stroke-width="2">
     
                     </rect>
@@ -125,7 +130,8 @@
             overview.update();
         }
         function updateNetwork() {
-            network.update();
+            let did_list = [selectedData];
+            network.update(did_list);
         }
 
         // CSV 파일 경로
@@ -142,13 +148,13 @@
                 data_all = datas_all;
                 dialog = new Dialog("#dialog", data_all);
                 dialog.initialize();
-                dialog.update();
 
                 updateDialog();
 
-                network = new Network("#network_node_link", "#network_adjacency_matrix", data_all);
+                network = new Network("#network_legend", "#network_adjacency_matrix", data_all);
                 network.initialize();
-                network.update();
+
+                updateNetwork();
             })
         
         d3.csv(filepath_overview) // 파일 2에 대해서 update (#overview)
@@ -161,14 +167,12 @@
                 
                 overview = new Overview("#overview", '#overview-tooltip', datas_overview);
                 overview.initialize();
-                overview.update();
-
                 updateOverview();
 
                 overview.on("click", (clicked_item) => {
                     selectedData = clicked_item.dialog_id;
-                    console.log('clicked_item: ', clicked_item, 'selectedData: ', selectedData);
                     updateDialog();
+                    updateNetwork();
                 });
 
             })
