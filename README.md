@@ -6,4 +6,4 @@
 
 사용방법<br>
 1. local_server.py 실행
-2. test.html 접속
+2. http://localhost:8000/ 접속

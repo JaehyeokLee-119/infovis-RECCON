@@ -260,7 +260,10 @@ class Network {
                 .attr('dy', matrix_box_height/2)
                 .attr('text-anchor', 'middle')
                 .attr('dominant-baseline', 'middle')
-                .text(d => d)
+                .text(d => {
+                    if (d !== 0) return d;
+                    else return '';
+                })
                 .attr('class', 'matrix_text')
                 .attr('id', (d, i) => `matrix_text_${row}_${i}`)
                 .attr('font-size', this.fontsize)
@@ -315,7 +318,7 @@ class Network {
             .attr('x', end_x/2)
             .attr('y', 0)
             .attr('dx', matrix_box_width/2)
-            .text('Cause utterance emotion')
+            .text('< Cause utterance emotion >')
             .attr('text-anchor', 'middle')
             .attr('dominant-baseline', 'hanging')
             .attr('font-size', this.fontsize)
@@ -325,7 +328,7 @@ class Network {
             .append('text')
             .attr('x', 0)
             .attr('y', end_y/2)
-            .text('Emotion utterance emotion')
+            .text('< Emotion utterance emotion >')
             .attr('text-anchor', 'middle')
             .attr('dominant-baseline', 'baseline')
             .attr('font-size', this.fontsize) 

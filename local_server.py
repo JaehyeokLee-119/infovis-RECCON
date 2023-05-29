@@ -17,7 +17,6 @@ if __name__ == '__main__':
         http://localhost:8000/\n')
     httpd.serve_forever()
     
-    
     # localhost:8000/dailydialog_table_all.csv 요청 처리 시 서버 종료
     
     

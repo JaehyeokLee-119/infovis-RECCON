@@ -12,7 +12,8 @@ class Overview {
         this.height = svg_element.node().getBoundingClientRect().height;
         this.handlers = {};
         this.fontsize = 12;
-        
+        this.dragged = false;
+        this.dragging = false;
         this.emotion_color_policy = { // From d3.schemeCategory10
             'happy': '#ff7f0e',
             'neutral': '#7f7f7f',
@@ -23,6 +24,7 @@ class Overview {
             'fear': '#8C564B',
             'excited': '#17becf'
         }
+
     }
 
     initialize() {
@@ -34,7 +36,7 @@ class Overview {
         this.legend = this.svg.append("g");
         this.box_width = d3.select("#overview rect").node().getBoundingClientRect().width;
 
-        this.line_initial_stroke = 0.8;
+        this.line_initial_stroke = 1;
         this.line_hover_stroke = 3;
         this.line_hover_added_length = 3;
 
@@ -63,7 +65,6 @@ class Overview {
                     if (i>=4) return second_line_x_offset;
                     else return 0;
                 })
-                // .attr('y', i * this.fontsize * 1.5)
                 .attr('y', () => {
                     if (i>=4) return (i-4) * this.fontsize * 1.5;
                     else return i * this.fontsize * 1.5;
@@ -90,15 +91,24 @@ class Overview {
                 .text(emotion);
         }   
 
+        
+
     }
 
     update(len_criteria, emotion_filter) {
-
         d3.select(".clicked_triangle").remove();
         // svg에 있는 모든 거 삭제
         d3.select('svg')
             .selectAll(".overview_horizontal_line")
             .remove();
+
+        this.dragged = false;
+        this.dragging = false;
+        // drag 요소들 정리
+        d3.select('svg')
+            .selectAll(".dialog_drag_group")
+            .remove();
+
 
         let data = this.data;
 
@@ -130,10 +140,10 @@ class Overview {
         // data게수 세기
         let data_len = data.length;
 
-        // 좌측 시작 좌표
+        // 좌측 시작 좌표 
+        // 가로줄 긋기 (x축)
         let start_x = parseInt((this.box_width/2) - (data_len/2));
         let end_x = parseInt((this.box_width/2) + (data_len/2));
-        // 가로줄 긋기 (x축)
 
         d3.select('svg')
         .append("line")
@@ -169,15 +179,24 @@ class Overview {
                             element: this.tooltip.select(".tooltip-arrow").node(),
                         },
                     },
+                    // callback 함수 선언 (tooltip-inner의 위치를 조절하는 역할)
+                    {
+                        name: 'custom-modifier',
+                        phase: 'afterWrite',
+                        enabled: true,
+                        fn: (data) => {
+                            let tooltip_arrow_style = this.tooltip.select(".tooltip-arrow").attr("style");
+                            let tooltip_arrow_transform_x = tooltip_arrow_style.split("(")[1].split("px")[0];
+                            let tooltip_inner_width = this.tooltip.select(".tooltip-inner").node().getBoundingClientRect().width;
+                            this.tooltip.select(".tooltip-inner")
+                                .attr("style", `transform: translate(${tooltip_arrow_transform_x-tooltip_inner_width/2}px, 0px)`)
+                        }
+                        
+                    }
                 ],
             });
             this.tooltip.style("display", "block");
             
-            let tooltip_arrow_style = this.tooltip.select(".tooltip-arrow").attr("style");
-            let tooltip_arrow_transform_x = tooltip_arrow_style.split("translate(")[1].split("px")[0];
-            let tooltip_inner_width = this.tooltip.select(".tooltip-inner").node().getBoundingClientRect().width;
-            this.tooltip.select(".tooltip-inner")
-                .attr("style", `transform: translate(${tooltip_arrow_transform_x-tooltip_inner_width/2}px, 0px)`)
             
             // 2. e 대상(마우스 올라간 대상)의 line의 stroke를 두껍게 하고 보여지는 세로 크기를 늘린다.
             e.target.setAttribute("stroke-width", this.line_hover_stroke);
@@ -255,9 +274,115 @@ class Overview {
             .attr("stroke-width", this.line_initial_stroke)
             .attr("stroke", (d, i) => this.emotion_color_policy[d.emotion])
 
+        // // drag_block
+        // let drag_block_height = this.margin.bottom*2;
+        // let line_y = this.height - drag_block_height+drag_block_height*(1/3);
+        // this.drag_line_group = d3.select('svg')
+        //     .append("g")
+        //     .attr("class", "dialog_drag_group")
+
+        // this.drag_line_group // 가로줄긋기
+        //     .append("line")
+        //     .attr("class", "dialog_drag_line")
+        //     .attr("x1", 0)
+        //     .attr("x2", this.width)
+        //     .attr("y1", line_y)
+        //     .attr("y2", line_y)
+        //     .attr("stroke-width", 1)
+        //     .attr("stroke", "black")
+
+
+        // this.drag_line_group
+        //     .append("rect")
+        //     .attr("class", "dialog_drag_box")
+        //     .attr("x", 0)
+        //     .attr("width", this.width)
+        //     .attr("y", this.height - drag_block_height)
+        //     .attr("height", drag_block_height)
+        //     // 투명색
+        //     .attr("fill", "rgba(0,0,0,0)")
+        //     .attr("stroke-width", 1)
+        //     .on("mouseover", () => {
+        //         // 마우스 모양 변경 ( I-beam 모양으로  )
+        //         d3.select('svg').style("cursor", "col-resize");
+        //     })
+        //     .on("mouseout", () => {
+        //         // 마우스 모양 원래대로 변경
+        //         d3.select('svg').style("cursor", "default");
+        //     })
+        //     // 마우스 눌렀을 때 좌표 기록
+        //     .on("mousedown", (e) => {
+        //         this.drag_line_group
+        //             .selectAll(".dialog_drag_tmp_line")
+        //             .remove();
+        //         // 절대적인 위치가 아닌, box 안에서의 상대적인 위치를 기록
+        //         this.drag_line_x1 = e.x - d3.select(".dialog_drag_box").node().getBoundingClientRect().left;
+        //         this.dragged = false;
+        //         this.dragging = true;
+
+        //         // rect를 지운다
+        //         d3.select(".dialog_drag_rect").remove();
+        //         //  this.drag_line_x1 위치에 짧은 세로선을 그린다
+        //         this.drag_line_group
+        //             .append("line")
+        //             .attr("class", "dialog_drag_tmp_line")
+        //             .attr("x1", this.drag_line_x1)
+        //             .attr("x2", this.drag_line_x1)
+        //             .attr("y1", line_y + 5)
+        //             .attr("y2", line_y - 5)
+        //             .attr("stroke-width", 1)
+        //             .attr("stroke", "black")
+
+
+        //     })
+        //     // 마우스 눌렀다 뗐을 때 좌표 기록
+        //     .on("mouseup", (e) => {
+        //         this.drag_line_group
+        //             .selectAll(".dialog_drag_tmp_line")
+        //             .remove();
+
+        //         if (this.dragging == true) {
+        //             this.drag_line_x2 = e.x  - d3.select(".dialog_drag_box").node().getBoundingClientRect().left;
+        //             // 마우스 모양 원래대로 변경
+
+        //             // 마우스 눌렀다 뗀 좌표가 거의 같으면 아무것도 안함
+        //             // 마우스 눌렀다 뗀 좌표가 길면
+        //             if (Math.abs(this.drag_line_x1 - this.drag_line_x2) > 5) {
+        //                 this.dragged = true;
+        //                 this.dragging = false;
+        //                 // this.height 크기의 반투명한 사각형을 그린다
+
+        //                 let leftend = Math.min(this.drag_line_x1, this.drag_line_x2);
+        //                 let rightend = Math.max(this.drag_line_x1, this.drag_line_x2);
+        //                 // console.log('d3.select(".dialog_drag_box").node().getBoundingClientRect(): ',d3.select(".dialog_drag_box").node().getBoundingClientRect());
+                        
+        //                 this.handlers['drag'](leftend, rightend);
+
+                        
+        //                 this.drag_line_group
+        //                     .append("rect")
+        //                     .attr("class", "dialog_drag_rect")
+        //                     .attr("x", leftend)
+        //                     .attr("width", rightend-leftend)
+        //                     .attr("y", 0)
+        //                     .attr("height", 350)
+        //                     .attr("fill", "rgba(0,0,0,0.2)")
+        //                     .attr("stroke-width", 1)
+        //                     .attr("stroke", "black")
+        //                     .on("mousedown", () => {
+        //                         console.log("클릭");
+        //                         // 클릭 시 삭제 후 this.dragged = false
+        //                         d3.select(".dialog_drag_rect").remove();
+        //                         this.dragged = false;
+        //                         this.dragging = false;
+        //                     })
+        //                 }
+
+        //         }
+        //     })
+
     }
-    // 갑자기 mouse 관련 event 동작 안하게 된 이유는: lineplots를 update할 때, mouseover, mouseout, click event를 다시 등록해주지 않아서 그렇다.
-    // update할 때마다 event를 다시 등록해주어야 한다.
+
     on(eventType, handler) {
         this.handlers[eventType] = handler;
     }
