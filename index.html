@@ -112,6 +112,22 @@
             </div>
         </div>
         <div class="row">
+            <div class="col-3 text-end pe-2"><strong>Matrix 표시 기준:</strong></div>
+                <div class="col-9">
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="pair-matrix-criteria" value="one" id="pmc-one"
+                        checked>
+                        <label class="form-check-label" for="x-sl">대화 하나</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="pair-matrix-criteria" value="all" id="pmc-all"
+                            >
+                        <label class="form-check-label" for="x-sl">전체 대화</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
             <svg width="100%" height="300" id="overview">
                 <rect width="100%" height="100%" fill="white" stroke="black" stroke-width="2">
 
@@ -143,19 +159,21 @@
             <div class="col-6 text-lg-start">
                 <nav class="navbar navbar-light bg-light">
                     <div class="fluid">
-                        <span class="text-center navbar-brand mb-0 h1" id="dialog_num">Emotion-Cause Pair relationship</span>
+                        <span class="text-center navbar-brand mb-0 h1" id="dialog_num">Emotion-Cause Pair emotion relationship</span>
                     </div>
                 </nav>
-                <svg width="100%" height="400" id="network_adjacency_matrix">
-                    <rect width="100%" height="100%" fill="white" stroke="black" stroke-width="2">
-    
-                    </rect>
-                </svg>
-                <svg width="100%" height="200" id="network_legend">
-                    <rect width="100%" height="100%" fill="white" stroke="black" stroke-width="2">
-    
-                    </rect>
-                </svg>
+                <div class="">
+                    <svg width="100%" height="400" id="network_adjacency_matrix">
+                        <rect width="100%" height="100%" fill="white" stroke="black" stroke-width="2">
+        
+                        </rect>
+                    </svg>
+                    <svg width="100%" height="200" id="network_legend">
+                        <rect width="100%" height="100%" fill="white" stroke="black" stroke-width="2">
+        
+                        </rect>
+                    </svg>
+                </div>
             </div>
         </div>
     </main>
@@ -191,8 +209,10 @@
             overview.update(len_criteria, emotion_filter);
         }
         function updateNetwork() {
+            let matrix_criteria = d3.select("input[type=radio][name=pair-matrix-criteria]:checked").property("value");
+
             let did_list = [selectedData];
-            network.update(did_list);
+            network.update(did_list, matrix_criteria);
         }
 
         // CSV 파일 경로

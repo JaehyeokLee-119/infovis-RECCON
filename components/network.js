@@ -80,7 +80,8 @@ class Network {
         }   
 
     }
-    update(did_list) {
+    update(did_list, matrix_criteria) {
+        // matrix_criteria = 'one', 'all'
         this.utterance_list = [];
         this.emotion_cause_pair_list = {
             'emotion': [],
