@@ -48,17 +48,66 @@
         </nav>
 
     </header>
-    <main class="container pb-3"><div class="row pt-2">
-        <div class="col-2 text-end pe-2"><strong>정렬 기준:</strong></div>
-            <div class="col-10">
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="sorting-criteria" value="length" id="sc-len"
+    <main class="container pb-3">
+        <div class="row pt-2">
+            <div class="col-3 text-end pe-2"><strong>정렬 기준 (길이):</strong></div>
+                <div class="col-9">
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="sorting-criteria-length" value="length-random" id="sc-len-random"
                         checked>
-                    <label class="form-check-label" for="x-sl">대화 길이</label>
+                        <label class="form-check-label" for="x-sl">무작위</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="sorting-criteria-length" value="length-ascending" id="sc-len-asc"
+                            >
+                        <label class="form-check-label" for="x-sl">대화 길이(↗)</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="sorting-criteria-length" value="length-descending" id="sc-len-des"
+                            >
+                        <label class="form-check-label" for="x-sl">대화 길이(↘)</label>
+                    </div>
                 </div>
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="sorting-criteria" value="emotion" id="sc-emo">
-                    <label class="form-check-label" for="x-sw">대화 감정</label>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-3 text-end pe-2"><strong>정렬 기준 (감정):</strong></div>
+                <div class="col-9">
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" name="emotion-criteria" value="happy" id="sc-emo-happy"
+                            checked>
+                        <label class="form-check-label" for="x-sl">happy</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" name="emotion-criteria" value="angry" id="sc-emo-angry"
+                            checked>
+                        <label class="form-check-label" for="x-sl">angry</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" name="emotion-criteria" value="surprise" id="sc-emo-surprise"
+                            checked>
+                        <label class="form-check-label" for="x-sl">surprise</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" name="emotion-criteria" value="disgust" id="sc-emo-disgust"
+                            checked>
+                        <label class="form-check-label" for="x-sl">disgust</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" name="emotion-criteria" value="sad" id="sc-emo-sad"
+                            checked>
+                        <label class="form-check-label" for="x-sl">sad</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" name="emotion-criteria" value="fear" id="sc-emo-fear"
+                            checked>
+                        <label class="form-check-label" for="x-sl">fear</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" name="emotion-criteria" value="excited" id="sc-emo-excited"
+                            checked>
+                        <label class="form-check-label" for="x-sl">excited</label>
+                    </div>
                 </div>
             </div>
         </div>
@@ -67,6 +116,7 @@
                 <rect width="100%" height="100%" fill="white" stroke="black" stroke-width="2">
 
                 </rect>
+                <g id="lineplots"></g>
             </svg>
             <div class="tooltip bs-tooltip-top show" id="overview-tooltip" role="tooltip" style="display:none">
                 <div class="tooltip-arrow"></div>
@@ -127,7 +177,18 @@
             d3.select("#dialog_num").text("Dialog: " + did);
         }
         function updateOverview() {
-            overview.update();
+            let len_criteria = d3.select("input[type=radio][name=sorting-criteria-length]:checked").property("value");
+            // value: "length-random", "length-ascending", "length-descending"
+
+            let emotion_filter = [];
+
+            d3.selectAll("input[type=checkbox][name=emotion-criteria]")
+                .each((d, i, nodes) => {
+                    if (nodes[i].checked) {
+                        emotion_filter.push(nodes[i].value);
+                    }
+                })
+            overview.update(len_criteria, emotion_filter);
         }
         function updateNetwork() {
             let did_list = [selectedData];
@@ -164,6 +225,10 @@
                 });
                 datas_overview = datas_overview;
 
+                
+                d3.selectAll("input[type=radio][name=sorting-criteria-length]").on("change", updateOverview);
+                
+                d3.selectAll("input[type=checkbox][name=emotion-criteria]").on("change", updateOverview);
                 
                 overview = new Overview("#overview", '#overview-tooltip', datas_overview);
                 overview.initialize();

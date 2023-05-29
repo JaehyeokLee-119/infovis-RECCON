@@ -10,7 +10,6 @@ class Network {
         const svg_element = d3.select(this.svg_matrix);
         this.width = svg_element.node().getBoundingClientRect().width;
         this.height = svg_element.node().getBoundingClientRect().height;
-        console.log(this.width, this.height)
         
         this.fontsize = 13;
         this.emotion_color_policy = { // From d3.schemeCategory10
@@ -78,7 +77,7 @@ class Network {
                 })
                 .attr('font-size', this.fontsize)
                 .text(emotion);
-        }
+        }   
 
     }
     update(did_list) {
@@ -105,7 +104,6 @@ class Network {
                 current_start_index++;
             }
         }
-        console.log(this.utterance_list);
 
         for(var i = 0; i < dialog_start_index_list.length; i++) {
             let start_index = dialog_start_index_list[i];
@@ -160,7 +158,6 @@ class Network {
             }
             emotion_cause_link_adjacency_matrix.push(current_row);
         }
-        console.log('emotion_cause_link_adjacency_matrix: ', emotion_cause_link_adjacency_matrix);
 
 
         d3.selectAll(this.svg_matrix).selectAll('*').remove();
