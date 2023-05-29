@@ -21,7 +21,7 @@ class Dialog {
         this.brush_y1 = 0;
         this.brush_y2 = 0;
         this.brush_on = false;
-        
+
         this.font = "Ubuntu";
 
         this.emotion_color_policy = { // From d3.schemeCategory10
@@ -42,8 +42,10 @@ class Dialog {
     }
 
     update(did) {
-        this.utterance_list = [];
+        this.selected = false;
+
         // Get utterances with dialog_id
+        this.utterance_list = [];
         for(var i = 0; i < this.listed_data.length; i++) {
             if(this.listed_data[i].dialog_id == did) {
                 this.utterance_list.push(this.listed_data[i]);
@@ -75,6 +77,7 @@ class Dialog {
         };
 
         let onMouseClick = function() { // 클릭 시
+            
             // 다른 요소들의 class 속성 'selected' 제거
             d3.select(this.parentNode) // 부모 요소 선택 (<svg> 요소)
                 .selectAll("g") // 하위 <g> 요소 선택
@@ -87,19 +90,25 @@ class Dialog {
                 .select(".utterance") // 하위 <text> 요소 선택
                 .style("font-weight", "normal")
 
-            let cause_turns_of_this_turn = d3.select(this).attr("cause_turns");
-            if (cause_turns_of_this_turn != "") {
-                cause_turns_of_this_turn = cause_turns_of_this_turn.slice(1, cause_turns_of_this_turn.length-1);
-                cause_turns_of_this_turn = cause_turns_of_this_turn.split(',');
-                cause_turns_of_this_turn = cause_turns_of_this_turn.map(x => parseInt(x)); // 숫자로
+
+                // deep copy d3.select(this).attr("cause_turns")
+            
+            let cause_turns_of_this_turn_click = d3.select(this).attr("cause_turns");
+            if (cause_turns_of_this_turn_click != "") {
+                if (cause_turns_of_this_turn_click[0] == '[') {
+                    cause_turns_of_this_turn_click = cause_turns_of_this_turn_click.slice(1, cause_turns_of_this_turn_click.length-1);
+                }
+                cause_turns_of_this_turn_click = cause_turns_of_this_turn_click.split(',');
+                cause_turns_of_this_turn_click = cause_turns_of_this_turn_click.map(x => parseInt(x)); // 숫자로
+                cause_turns_of_this_turn_click = cause_turns_of_this_turn_click.filter(x => !isNaN(x)); // 'b' 없애기
             }
 
             d3.select(this.parentNode)
                 .selectAll("g")
                 .filter(function() { // 현재 요소의 class 속성 값이 'selected'인지 확인
                     // 1) cause_turns이 있다면 파싱해서 배열로 만듦
-                    for(let i = 0; i < cause_turns_of_this_turn.length; i++) {
-                        if(d3.select(this).attr("turn") == cause_turns_of_this_turn[i]) return true;
+                    for(let i = 0; i < cause_turns_of_this_turn_click.length; i++) {
+                        if(parseInt(d3.select(this).attr("turn")) === cause_turns_of_this_turn_click[i]) return true;
                     }
                     return false;
                 })
@@ -117,6 +126,13 @@ class Dialog {
         
         let frame = d3.select(this.svg);
 
+        // Get utterances with dialog_id
+        this.utterance_list = [];
+        for(var i = 0; i < this.listed_data.length; i++) {
+            if(this.listed_data[i].dialog_id == did) {
+                this.utterance_list.push(this.listed_data[i]);
+            }
+        }
         let conversation = frame
             .selectAll("g")
             .data(this.utterance_list) // this.utterance_list를 하나씩 꺼내서, this.svg에 하위 태그로 <text>를 만들어서 넘겨준다 
@@ -124,9 +140,14 @@ class Dialog {
             .attr("id", (d, i) => "utterance" + i)
             .attr("turn", (d, i) => i+1)
             .attr("cause_turns", (d, i) => {
-                let cause_turns_of_this_turn = d.cause_turn.slice(1, d.cause_turn.length-1);
+                
+                let cause_turns_of_this_turn = d.cause_turn
+                
+                if (cause_turns_of_this_turn[0] == '[') {
+                    cause_turns_of_this_turn = cause_turns_of_this_turn.slice(1, d.cause_turn.length-1);
+                }
                 // d.cause_turn을 , 기준으로 나누어 배열로 만들기
-                cause_turns_of_this_turn = cause_turns_of_this_turn.split(', ');
+                cause_turns_of_this_turn = cause_turns_of_this_turn.split(',');
                 cause_turns_of_this_turn = cause_turns_of_this_turn.map(x => parseInt(x)); // 숫자로
                 cause_turns_of_this_turn = cause_turns_of_this_turn.filter(x => !isNaN(x)); // 'b' 없애기
                 if (cause_turns_of_this_turn.length == 0) {
@@ -241,26 +262,29 @@ class Dialog {
             ];
             if (d.cause_turn != '') {
                 // d.cause_turn의 양 끝의 [, ] 제거
-                let cause_turns_of_this_turn = d.cause_turn.slice(1, d.cause_turn.length-1);
                 // d.cause_turn을 , 기준으로 나누어 배열로 만들기
-                cause_turns_of_this_turn = cause_turns_of_this_turn.split(', ');
-                cause_turns_of_this_turn = cause_turns_of_this_turn.map(x => parseInt(x)); // 숫자로
-                cause_turns_of_this_turn = cause_turns_of_this_turn.filter(x => !isNaN(x)); // 'b' 없애기
+                let cause_turns_of_this_turn_autolining = d.cause_turn;
+                if (d.cause_turn[0] == '[') {
+                    cause_turns_of_this_turn_autolining = d.cause_turn.slice(1, d.cause_turn.length-1);
+                }
+                cause_turns_of_this_turn_autolining = cause_turns_of_this_turn_autolining.split(',');
+                cause_turns_of_this_turn_autolining = cause_turns_of_this_turn_autolining.map(x => parseInt(x)); // 숫자로
+                cause_turns_of_this_turn_autolining = cause_turns_of_this_turn_autolining.filter(x => !isNaN(x)); // 'b' 없애기
 
-                if (cause_turns_of_this_turn.length > 0) {
+                if (cause_turns_of_this_turn_autolining.length > 0) {
                     text_color_list.push(
                         {text: ': ', color: 'black', weight: 'normal'},
                     )
-                    for(let i = 0; i < cause_turns_of_this_turn.length; i++) {
-                        let cause_turn = parseInt(cause_turns_of_this_turn[i]);
+                    for(let i = 0; i < cause_turns_of_this_turn_autolining.length; i++) {
+                        let cause_turn = parseInt(cause_turns_of_this_turn_autolining[i]);
                         if (isNaN(cause_turn)) {
                             continue;
                         }
                         let cause_color = this.emotion_color_policy[this.utterance_list[cause_turn-1].emotion];
                         text_color_list.push(
-                            {text: cause_turns_of_this_turn[i], color: cause_color, weight: 'bold'},
+                            {text: cause_turns_of_this_turn_autolining[i], color: cause_color, weight: 'bold'},
                         )
-                        if (i != cause_turns_of_this_turn.length-1) {
+                        if (i != cause_turns_of_this_turn_autolining.length-1) {
                             text_color_list.push(
                                 {text: ', ', color: 'black', weight: 'normal'},
                             )

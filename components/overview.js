@@ -28,6 +28,7 @@ class Overview {
     }
 
     initialize() {
+        this.filtered_data = this.data;
         this.svg = d3.select(this.svg);
         this.tooltip = d3.select(this.tooltip);
         this.container = this.svg.append("g");
@@ -136,7 +137,7 @@ class Overview {
         
         // this.dialog_list를 this.box_width개로 줄이기
         data = data.slice(0, this.box_width);
-
+        this.filtered_data = data;
         // data게수 세기
         let data_len = data.length;
 
@@ -382,7 +383,13 @@ class Overview {
         //     })
 
     }
-
+    getAlldid() {
+        let alldid = [];
+        this.filtered_data.forEach((d) => {
+            alldid.push(d.dialog_id);
+        })
+        return alldid;
+    }
     on(eventType, handler) {
         this.handlers[eventType] = handler;
     }
