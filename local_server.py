@@ -12,7 +12,7 @@ if __name__ == '__main__':
     # python local_server.py
     server_address = ('localhost', 8000)
     httpd = HTTPServer(server_address, MyRequestHandler)
-    print('로컬 개발 서버 실행 중...\n\
+    print('로컬 서버 실행 중...\n\
         http://localhost:8000/\n')
     httpd.serve_forever()
     
