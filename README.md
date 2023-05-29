@@ -5,5 +5,5 @@
 사용한 데이터셋: [RECCON dataset](https://github.com/declare-lab/RECCON) <br>
 
 사용방법<br>
-1. local_server.py 실행
+1. local_server.py 실행 (python local_server.py)
 2. http://localhost:8000/ 접속
