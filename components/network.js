@@ -109,7 +109,6 @@ class Network {
                 // this.listed_data[i].dialog_id가 did_list에 들어 있을 경우
                 // utterance_list에 추가
                 if (current_did != this.listed_data[i].dialog_id) {
-                    console.log('current did: ', current_did);
                     current_did = this.listed_data[i].dialog_id;
                     dialog_start_index_list.push(current_start_index);
                 }
@@ -117,7 +116,6 @@ class Network {
                 current_start_index++;
             }
         }
-        console.log('did_list: ', did_list);
         for(var i = 0; i < dialog_start_index_list.length; i++) {
             let start_index = dialog_start_index_list[i];
             if (i == dialog_start_index_list.length - 1) {
@@ -125,7 +123,6 @@ class Network {
             } else {
                 var end_index = dialog_start_index_list[i+1];
             }
-            console.log('start_index: ', start_index, 'end_index: ', end_index);
             for(var j = start_index; j < end_index; j++) { // j: this.utterance_list 속에서 현재 발화의 index
                 let current_utterance = this.utterance_list[j];
                 if(current_utterance.emotion != 'neutral') {
@@ -156,7 +153,6 @@ class Network {
                 }
             }
         }
-        console.log('emotion_cause_pair_list: ', this.emotion_cause_pair_list);
         
         // Emotion-cause link adjacency matrix 계산
         let emotion_list = ['happy', 'neutral', 'angry', 'surprise', 'disgust', 'sad', 'fear', 'excited'];
@@ -176,7 +172,6 @@ class Network {
             }
             emotion_cause_link_adjacency_matrix.push(current_row);
         }
-        console.log('emotion cause link adjacency matrix: ', emotion_cause_link_adjacency_matrix);
 
         d3.selectAll(this.svg_matrix).selectAll('*').remove();
         
