@@ -1,4 +1,4 @@
-class Network {
+class Matrix {
     margin = {
         top: 10, right: 10, bottom: 0, left: 10
     }

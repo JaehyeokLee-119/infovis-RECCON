@@ -15,7 +15,7 @@
     <!-- import -->
     <script src="components/dialog.js"></script>
     <script src="components/overview.js"></script>
-    <script src="components/network.js"></script>
+    <script src="components/matrix.js"></script>
 
     <title>RECCON plotting test</title>
     <style>
@@ -178,12 +178,12 @@
         </div>
     </main>
     <script>
-        let data, selectedData, dialog, overview, network;
+        let data, selectedData, dialog, overview, matrix;
         // brushedData는 overview에서 브러쉬를 통해 선택된 데이터를 저장하는 변수
         // dialog_id 배열로 이루어져 있음
 
-        let filepath = "http://localhost:8000/dailydialog_table_all.csv";
-        let filepath_overview = "http://localhost:8000/dailydialog_table.csv";
+        let filepath = "https://raw.githubusercontent.com/jaehyeokLee-119/infovis-RECCON/main/dailydialog_table_all.csv"//"http://localhost:8000/dailydialog_table_all.csv";
+        let filepath_overview = "https://raw.githubusercontent.com/jaehyeokLee-119/infovis-RECCON/main/dailydialog_table.csv"// "http://localhost:8000/dailydialog_table.csv";
         
         selectedData = 'tr_4466';
 
@@ -194,7 +194,7 @@
             // #dialog_num의 text를 업데이트
             d3.select("#dialog_num").text("Dialog: " + did);
         }
-        function updateNetwork() {
+        function updateMatrix() {
             let matrix_criteria = d3.select("input[type=radio][name=pair-matrix-criteria]:checked").property("value");
 
             let did_list = null;
@@ -203,7 +203,7 @@
             } else if (matrix_criteria === 'all') {
                 did_list = overview.getAlldid();
             }
-            network.update(did_list);
+            matrix.update(did_list);
         }
         function updateOverview() {
             let len_criteria = d3.select("input[type=radio][name=sorting-criteria-length]:checked").property("value");
@@ -236,9 +236,9 @@
                 dialog.initialize();
                 updateDialog();
 
-                network = new Network("#network_legend", "#network_adjacency_matrix", data_all);
-                network.initialize();
-                updateNetwork();
+                matrix = new Network("#network_legend", "#network_adjacency_matrix", data_all);
+                matrix.initialize();
+                updateMatrix();
             })
         
         d3.csv(filepath_overview) // 파일 2에 대해서 update (#overview)
@@ -254,15 +254,15 @@
                 
                 d3.selectAll("input[type=radio][name=sorting-criteria-length]").on("change", function() {
                     updateOverview();
-                    updateNetwork();
+                    updateMatrix();
                 });
                 
                 d3.selectAll("input[type=checkbox][name=emotion-criteria]").on("change", function() {
                     updateOverview();
-                    updateNetwork();
+                    updateMatrix();
                 });
 
-                d3.selectAll("input[type=radio][name=pair-matrix-criteria]").on("change", updateNetwork);
+                d3.selectAll("input[type=radio][name=pair-matrix-criteria]").on("change", updateMatrix);
 
                 overview = new Overview("#overview", '#overview-tooltip', datas_overview);
                 overview.initialize();
@@ -271,7 +271,7 @@
                 overview.on("click", (clicked_item) => {
                     selectedData = clicked_item.dialog_id;
                     updateDialog();
-                    updateNetwork();
+                    updateMatrix();
                 });
 
             })
