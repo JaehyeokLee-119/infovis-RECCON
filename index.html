@@ -163,12 +163,12 @@
                     </div>
                 </nav>
                 <div class="">
-                    <svg width="100%" height="400" id="network_adjacency_matrix">
+                    <svg width="100%" height="400" id="matrix_adjacency_matrix">
                         <rect width="100%" height="100%" fill="white" stroke="black" stroke-width="2">
         
                         </rect>
                     </svg>
-                    <svg width="100%" height="200" id="network_legend">
+                    <svg width="100%" height="200" id="matrix_legend">
                         <rect width="100%" height="100%" fill="white" stroke="black" stroke-width="2">
         
                         </rect>
@@ -236,7 +236,7 @@
                 dialog.initialize();
                 updateDialog();
 
-                matrix = new Network("#network_legend", "#network_adjacency_matrix", data_all);
+                matrix = new Matrix("#matrix_legend", "#matrix_adjacency_matrix", data_all);
                 matrix.initialize();
                 updateMatrix();
             })
