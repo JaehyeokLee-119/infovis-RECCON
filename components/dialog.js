@@ -95,12 +95,17 @@ class Dialog {
             
             let cause_turns_of_this_turn_click = d3.select(this).attr("cause_turns");
             if (cause_turns_of_this_turn_click != "") {
-                if (cause_turns_of_this_turn_click[0] == '[') {
-                    cause_turns_of_this_turn_click = cause_turns_of_this_turn_click.slice(1, cause_turns_of_this_turn_click.length-1);
-                }
+                // if (cause_turns_of_this_turn_click{[0] == '[') 
+                //  cause_turns_of_this_turn_click = cause_turns_of_this_turn_click.slice(1, cause_turns_of_this_turn_click.length-1);
+                // }
+                cause_turns_of_this_turn_click = cause_turns_of_this_turn_click.replaceAll('[', '');
+                cause_turns_of_this_turn_click = cause_turns_of_this_turn_click.replaceAll(']', '');
                 cause_turns_of_this_turn_click = cause_turns_of_this_turn_click.split(',');
                 cause_turns_of_this_turn_click = cause_turns_of_this_turn_click.map(x => parseInt(x)); // 숫자로
                 cause_turns_of_this_turn_click = cause_turns_of_this_turn_click.filter(x => !isNaN(x)); // 'b' 없애기
+                
+                // 중복 제거
+                cause_turns_of_this_turn_click = [...new Set(cause_turns_of_this_turn_click)];
             }
 
             d3.select(this.parentNode)
@@ -143,13 +148,17 @@ class Dialog {
                 
                 let cause_turns_of_this_turn = d.cause_turn
                 
-                if (cause_turns_of_this_turn[0] == '[') {
-                    cause_turns_of_this_turn = cause_turns_of_this_turn.slice(1, d.cause_turn.length-1);
-                }
+                // if (cause_turns_of_this_turn[0] == '[') {
+                //     cause_turns_of_this_turn = cause_turns_of_this_turn.slice(1, d.cause_turn.length-1);
+                // }
+                cause_turns_of_this_turn = cause_turns_of_this_turn.replaceAll('[', '');
+                cause_turns_of_this_turn = cause_turns_of_this_turn.replaceAll(']', '');
                 // d.cause_turn을 , 기준으로 나누어 배열로 만들기
                 cause_turns_of_this_turn = cause_turns_of_this_turn.split(',');
                 cause_turns_of_this_turn = cause_turns_of_this_turn.map(x => parseInt(x)); // 숫자로
                 cause_turns_of_this_turn = cause_turns_of_this_turn.filter(x => !isNaN(x)); // 'b' 없애기
+                // 중복 제거
+                cause_turns_of_this_turn = [...new Set(cause_turns_of_this_turn)];
                 if (cause_turns_of_this_turn.length == 0) {
                     return "";
                 } else {
@@ -264,12 +273,17 @@ class Dialog {
                 // d.cause_turn의 양 끝의 [, ] 제거
                 // d.cause_turn을 , 기준으로 나누어 배열로 만들기
                 let cause_turns_of_this_turn_autolining = d.cause_turn;
-                if (d.cause_turn[0] == '[') {
-                    cause_turns_of_this_turn_autolining = d.cause_turn.slice(1, d.cause_turn.length-1);
-                }
+                // if (d.cause_turn[0] == '[') {
+                //     cause_turns_of_this_turn_autolining = d.cause_turn.slice(1, d.cause_turn.length-1);
+                // }
+                
+                cause_turns_of_this_turn_autolining = cause_turns_of_this_turn_autolining.replaceAll('[', '');
+                cause_turns_of_this_turn_autolining = cause_turns_of_this_turn_autolining.replaceAll(']', '');
                 cause_turns_of_this_turn_autolining = cause_turns_of_this_turn_autolining.split(',');
                 cause_turns_of_this_turn_autolining = cause_turns_of_this_turn_autolining.map(x => parseInt(x)); // 숫자로
                 cause_turns_of_this_turn_autolining = cause_turns_of_this_turn_autolining.filter(x => !isNaN(x)); // 'b' 없애기
+                // 중복 제거
+                cause_turns_of_this_turn_autolining = [...new Set(cause_turns_of_this_turn_autolining)];
 
                 if (cause_turns_of_this_turn_autolining.length > 0) {
                     text_color_list.push(

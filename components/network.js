@@ -91,12 +91,25 @@ class Network {
         let dialog_start_index_list = []; // utterance_list에서 각 dialog의 시작 index를 저장
         // Get utterances with dialog_id
 
+        if (Array.isArray(did_list) == false) did_list = [did_list];
         let current_did = '';
         let current_start_index = 0;
         for(var i = 0; i < this.listed_data.length; i++) {
             // this.listed_data[i].dialog_id가 did_list에 있으면, utterance를 utterance_list에 추가
-            if (did_list.includes(this.listed_data[i].dialog_id)) {
+
+            // did_list 속에  this.listed_data[i].dialog_id가 있는지 확인
+            let is_included = false;
+            for (let j = 0; j < did_list.length; j++) {
+                if (this.listed_data[i].dialog_id === did_list[j]) {
+                    is_included = true;
+                    break;
+                }
+            }
+            if (is_included) {
+                // this.listed_data[i].dialog_id가 did_list에 들어 있을 경우
+                // utterance_list에 추가
                 if (current_did != this.listed_data[i].dialog_id) {
+                    console.log('current did: ', current_did);
                     current_did = this.listed_data[i].dialog_id;
                     dialog_start_index_list.push(current_start_index);
                 }
@@ -104,7 +117,7 @@ class Network {
                 current_start_index++;
             }
         }
-
+        console.log('did_list: ', did_list);
         for(var i = 0; i < dialog_start_index_list.length; i++) {
             let start_index = dialog_start_index_list[i];
             if (i == dialog_start_index_list.length - 1) {
@@ -112,6 +125,7 @@ class Network {
             } else {
                 var end_index = dialog_start_index_list[i+1];
             }
+            console.log('start_index: ', start_index, 'end_index: ', end_index);
             for(var j = start_index; j < end_index; j++) { // j: this.utterance_list 속에서 현재 발화의 index
                 let current_utterance = this.utterance_list[j];
                 if(current_utterance.emotion != 'neutral') {
@@ -121,12 +135,14 @@ class Network {
                     current_utterance.cause_turn = current_utterance.cause_turn.replaceAll(' ', '');
                     let cause_turns = current_utterance.cause_turn.split(',');
 
-                    // 'b' 제거 전
+                    // 'b' 제거 
                     // cause_turns에서 숫자인 원소만 남기기
                     cause_turns = cause_turns.filter(x => !isNaN(x));
-                    // 'b' 제거 후
+
                     if (cause_turns.length == 0) continue;
                     cause_turns = cause_turns.map(x => parseInt(x) - 1); // cause_turns에 1을 뺀다 (turn 수 -> index)
+                    // 중복 제거
+                    cause_turns = [...new Set(cause_turns)];
 
                     // cause_turns: current_utterance의 cause 발화의 index 배열
                     for(var k = 0; k < cause_turns.length; k++) {
@@ -140,6 +156,8 @@ class Network {
                 }
             }
         }
+        console.log('emotion_cause_pair_list: ', this.emotion_cause_pair_list);
+        
         // Emotion-cause link adjacency matrix 계산
         let emotion_list = ['happy', 'neutral', 'angry', 'surprise', 'disgust', 'sad', 'fear', 'excited'];
         let emotion_cause_link_adjacency_matrix = [];
@@ -158,7 +176,7 @@ class Network {
             }
             emotion_cause_link_adjacency_matrix.push(current_row);
         }
-
+        console.log('emotion cause link adjacency matrix: ', emotion_cause_link_adjacency_matrix);
 
         d3.selectAll(this.svg_matrix).selectAll('*').remove();
         
